@@ -7,6 +7,8 @@ import (
 	"net/http"
 	"path/filepath"
 	"text/template"
+
+	"github.com/yen-yjhyung/gowebapplication/hello-world/pkg/config"
 )
 
 func RenderTemplate(w http.ResponseWriter, html string) {
@@ -19,21 +21,21 @@ func RenderTemplate(w http.ResponseWriter, html string) {
 }
 
 func RenderTemplateV2(w http.ResponseWriter, html string) {
-	// 1. create a template cache
-	tc, err := createTemplateCatche()
-	if err != nil {
-		log.Fatal(err)
+	var tc map[string]*template.Template
+	if app.UseCache {
+		tc = app.TemplateCache
+	} else {
+		tc, _ = CreateTemplateCatche()
 	}
-
 	// 2. get requested template from cache
 	t, ok := tc[html]
 	if !ok {
-		log.Fatal(err)
+		log.Fatal("could not get template from template cache")
 	}
 
 	buf := new(bytes.Buffer)
 
-	err = t.Execute(buf, nil)
+	err := t.Execute(buf, nil)
 	if err != nil {
 		log.Println(err)
 	}
@@ -45,7 +47,7 @@ func RenderTemplateV2(w http.ResponseWriter, html string) {
 	}
 }
 
-func createTemplateCatche() (map[string]*template.Template, error) {
+func CreateTemplateCatche() (map[string]*template.Template, error) {
 	myCache := map[string]*template.Template{}
 
 	// get all of the files named *.page.html from ./hello-world/templates
@@ -80,4 +82,11 @@ func createTemplateCatche() (map[string]*template.Template, error) {
 
 	return myCache, nil
 
+}
+
+var app *config.AppConfig
+
+// NewTemplates sets the config for the template package
+func NewTemplates(a *config.AppConfig) {
+	app = a
 }
