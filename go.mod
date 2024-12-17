@@ -2,4 +2,7 @@ module github.com/yen-yjhyung/gowebapplication
 
 go 1.22.0
 
-require github.com/go-chi/chi/v5 v5.2.0 // indirect
+require (
+	github.com/go-chi/chi/v5 v5.2.0 // indirect
+	github.com/justinas/nosurf v1.1.1 // indirect
+)
