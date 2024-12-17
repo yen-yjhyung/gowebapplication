@@ -27,13 +27,15 @@ func main() {
 	repo := handlers.NewRepo(&app)
 	handlers.NewHandlers(repo)
 
-	http.HandleFunc("/", handlers.Repo.Home)
-	http.HandleFunc("/about", handlers.Repo.About)
-
 	fmt.Println("Starting application on port", portNumber)
-	err = http.ListenAndServe(portNumber, nil)
+
+	serve := &http.Server{
+		Addr:    portNumber,
+		Handler: routes(&app),
+	}
+
+	err = serve.ListenAndServe()
 	if err != nil {
-		fmt.Println(err)
-		return
+		log.Fatal(err)
 	}
 }

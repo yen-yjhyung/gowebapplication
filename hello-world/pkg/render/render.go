@@ -9,6 +9,7 @@ import (
 	"text/template"
 
 	"github.com/yen-yjhyung/gowebapplication/hello-world/pkg/config"
+	"github.com/yen-yjhyung/gowebapplication/hello-world/pkg/models"
 )
 
 func RenderTemplate(w http.ResponseWriter, html string) {
@@ -20,7 +21,7 @@ func RenderTemplate(w http.ResponseWriter, html string) {
 	}
 }
 
-func RenderTemplateV2(w http.ResponseWriter, html string) {
+func RenderTemplateV2(w http.ResponseWriter, html string, td *models.TemplateData) {
 	var tc map[string]*template.Template
 	if app.UseCache {
 		tc = app.TemplateCache
@@ -35,7 +36,9 @@ func RenderTemplateV2(w http.ResponseWriter, html string) {
 
 	buf := new(bytes.Buffer)
 
-	err := t.Execute(buf, nil)
+	td = AddDefaultData(td)
+
+	err := t.Execute(buf, td)
 	if err != nil {
 		log.Println(err)
 	}
@@ -89,4 +92,8 @@ var app *config.AppConfig
 // NewTemplates sets the config for the template package
 func NewTemplates(a *config.AppConfig) {
 	app = a
+}
+
+func AddDefaultData(td *models.TemplateData) *models.TemplateData {
+	return td
 }
